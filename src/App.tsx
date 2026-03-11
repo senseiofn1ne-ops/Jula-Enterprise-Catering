@@ -74,7 +74,7 @@ const FloatingElement = ({ children, delay = 0, yOffset = 20, duration = 4, clas
   <motion.div
     animate={{ y: [0, -yOffset, 0], rotate: [0, 5, -5, 0] }}
     transition={{ duration, repeat: Infinity, ease: "easeInOut", delay }}
-    className={`absolute ${className}`}
+    className={`absolute pointer-events-none ${className}`}
   >
     {children}
   </motion.div>
