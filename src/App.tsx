@@ -80,7 +80,7 @@ const FloatingElement = ({ children, delay = 0, yOffset = 20, duration = 4, clas
   </motion.div>
 );
 
-const Hero = () => (
+const Hero = ({ onOpenMenu }: { onOpenMenu: () => void }) => (
   <section className="relative min-h-screen flex items-center overflow-hidden pt-16 md:pt-20">
     {/* Blobs — hidden on mobile so they don't add whitespace */}
     <div className="hidden md:block absolute top-20 -left-20 w-96 h-96 bg-saffron/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
@@ -138,7 +138,7 @@ const Hero = () => (
           transition={{ delay: 0.5, duration: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-3 px-4"
         >
-          <button onClick={() => setIsMenuOpen(true)} className="w-full sm:w-auto px-8 py-4 bg-saffron text-white rounded-full font-bold text-base md:text-lg hover:bg-ink transition-colors hover-expand flex items-center justify-center gap-2">
+          <button onClick={onOpenMenu} className="w-full sm:w-auto px-8 py-4 bg-saffron text-white rounded-full font-bold text-base md:text-lg hover:bg-ink transition-colors hover-expand flex items-center justify-center gap-2">
             View Menu <ArrowRight size={20} />
           </button>
           <button className="w-full sm:w-auto px-8 py-4 bg-white text-ink border-2 border-ink rounded-full font-bold text-base md:text-lg hover:bg-ink hover:text-white transition-colors hover-expand">
@@ -395,7 +395,7 @@ export default function App() {
   return (
     <div className="font-sans selection:bg-saffron selection:text-white">
       <Navbar onOpenGallery={() => setIsGalleryOpen(true)} />
-      <Hero />
+      <Hero onOpenMenu={() => setIsMenuOpen(true)} />
       <WhyUs />
       <MenuSection />
       <Testimonials />
