@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { X, ChevronLeft, ChevronRight, ChefHat } from 'lucide-react';
 
 const IMGS: Record<string, string> = {
@@ -14,88 +14,32 @@ const IMGS: Record<string, string> = {
 };
 
 const SECTIONS = [
-  {
-    id: 'tiffin', img: 'tiffin',
-    title: 'South Indian Tiffin', emoji: '🍛',
-    accent: '#F5A623',
-    tagline: 'Morning legends, served fresh',
-    veg: ['Tomato Rice','White Rice','Coriander Rice (Kothi Mera)','Pudina Rice','Curry Leaves Rice','Veg Pulao','Idli','Vada','Poori','Plain Dosa','Set Dosa','Rava Dosa','Tamil Nadu Style Sambar','Andhra Style Sambar / Papu Pulusu','Pesara Attu','Upma','Ragi Upma','Bombay Rava Upma','Poha','Ugani','Rasam'],
-    nonveg: [],
-  },
-  {
-    id: 'chapathi', img: 'chapathi',
-    title: 'Chapathis & Breads', emoji: '🫓',
-    accent: '#C8943C',
-    tagline: 'The carb army, hot off the tawa',
-    veg: ['Plain Chapathi / Tawa Roti','Phulka','Methi Roti','Multigrain Roti','Aloo Paratha','Gobi Paratha','Paneer Paratha','Kerala Paratha (Malabar Parotta)','Lachha Paratha','Plain Kulcha','Butter Kulcha','Garlic Kulcha','Paneer Kulcha','Aloo Kulcha'],
-    nonveg: [],
-  },
-  {
-    id: 'curry', img: 'curry',
-    title: 'Curries & Gravies', emoji: '🍲',
-    accent: '#C84830',
-    tagline: 'Where gravies rule and rotis obey',
-    veg: ['Mixed Veg Curry / Kurma','Moong Dal North Style','Chinta Chiguru Dal','Mirchi Ka Salam','Mushroom Curry','Brinjal Curry (Guti)','Aloo Curry','Cauliflower Curry','Cabbage Curry','Beans Curry','Paneer Butter Masala','Paneer Curry','Palak Paneer'],
-    nonveg: ['Chicken Curry','Chicken Gravy','Mutton Curry','Fish Curry','Prawns Curry'],
-  },
-  {
-    id: 'indochinese', img: 'indochinese',
-    title: 'Indo-Chinese', emoji: '🥢',
-    accent: '#E07030',
-    tagline: 'Desi spice meets the wok',
-    veg: ['Veg Fried Rice','Veg Noodles','Veg Manchurian','Gobi Manchurian'],
-    nonveg: ['Chicken Fried Rice','Egg Fried Rice','Double Egg Fried Rice','Chicken Noodles','Egg Noodles','Double Egg Noodles','Chicken Manchurian','Chilli Chicken','Chicken 65','Chicken Fry','Chicken Kabab'],
-  },
-  {
-    id: 'pickles', img: 'pickles',
-    title: 'Pickles & Pachadis', emoji: '🫙',
-    accent: '#7CB342',
-    tagline: 'Tiny jars. Massive attitude.',
-    veg: ['Mamidikaya Turumu Pachadi','Mango Pickle','Green Chilli Pickle','Carrot Turumu','Madras Illi Karam','Grape Pickle','Cauliflower Pickle','Beerakaya Pickle','Sorakaya Pickle','Lemon Pickle','Garlic Pickle','Tomato Pickle','Gongura Pickle'],
-    nonveg: [],
-  },
-  {
-    id: 'biryani', img: 'biryani',
-    title: 'Biryanis', emoji: '🍛',
-    accent: '#D4A843',
-    tagline: 'Infinite timelines. One destiny.',
-    veg: ['Veg Biryani','Paneer Biryani','Plain Dum Biryani','Panasa Biryani','Mushroom Biryani','Green Biryani','Baby Corn Mushroom Biryani'],
-    nonveg: ['Chicken Dum Biryani','Chicken Fry Piece Biryani','Mutton Dum Biryani','Prawns Fry Biryani','Fish Fry Biryani','Special Chicken Biryani','Egg Biryani'],
-  },
-  {
-    id: 'streetsnack', img: 'streetsnack',
-    title: 'Street Snacks', emoji: '🍢',
-    accent: '#FF6B35',
-    tagline: 'The 5PM hunger patch',
-    veg: ['Onion Pakodi','Mirchi Bajji','Punugulu','Samosa','Peanut Masala','Bread Bonda','Hara Bara Kabab','Bread Pulu Kabab','Sandwich','Veg Cutlet','Paneer Baji','Bread Cutlet'],
-    nonveg: ['Fish Pakodi','Loose Prawns','Apollo Fish','Krish Kama'],
-  },
-  {
-    id: 'sweets', img: 'sweets',
-    title: 'Sweets & Desserts', emoji: '🍮',
-    accent: '#E8A030',
-    tagline: 'Every meal deserves a sweet ending',
-    veg: ['Gulab Jamun','Carrot Halwa','Badam Halwa','Fruit Halwa','Fruit Salad','Vegetable Salad','Kacha Apple Burfi','Tarangani Sweet','Ice Cream','Basundi','Malpuri','Dry Fruit Sweets'],
-    nonveg: [],
-  },
+  { id: 'tiffin', img: 'tiffin', title: 'South Indian Tiffin', emoji: '🍛', accent: '#F5A623', tagline: 'Morning legends, served fresh', veg: ['Tomato Rice','White Rice','Coriander Rice','Pudina Rice','Curry Leaves Rice','Veg Pulao','Idli','Vada','Poori','Plain Dosa','Set Dosa','Rava Dosa','Tamil Nadu Style Sambar','Andhra Style Sambar / Papu Pulusu','Pesara Attu','Upma','Ragi Upma','Bombay Rava Upma','Poha','Ugani','Rasam'], nonveg: [] },
+  { id: 'chapathi', img: 'chapathi', title: 'Chapathis & Breads', emoji: '🫓', accent: '#C8943C', tagline: 'The carb army, hot off the tawa', veg: ['Plain Chapathi / Tawa Roti','Phulka','Methi Roti','Multigrain Roti','Aloo Paratha','Gobi Paratha','Paneer Paratha','Kerala Paratha','Lachha Paratha','Plain Kulcha','Butter Kulcha','Garlic Kulcha','Paneer Kulcha','Aloo Kulcha'], nonveg: [] },
+  { id: 'curry', img: 'curry', title: 'Curries & Gravies', emoji: '🍲', accent: '#C84830', tagline: 'Where gravies rule and rotis obey', veg: ['Mixed Veg Curry / Kurma','Moong Dal North Style','Chinta Chiguru Dal','Mirchi Ka Salam','Mushroom Curry','Brinjal Curry (Guti)','Aloo Curry','Cauliflower Curry','Cabbage Curry','Beans Curry','Paneer Butter Masala','Paneer Curry','Palak Paneer'], nonveg: ['Chicken Curry','Chicken Gravy','Mutton Curry','Fish Curry','Prawns Curry'] },
+  { id: 'indochinese', img: 'indochinese', title: 'Indo-Chinese', emoji: '🥢', accent: '#E07030', tagline: 'Desi spice meets the wok', veg: ['Veg Fried Rice','Veg Noodles','Veg Manchurian','Gobi Manchurian'], nonveg: ['Chicken Fried Rice','Egg Fried Rice','Double Egg Fried Rice','Chicken Noodles','Egg Noodles','Double Egg Noodles','Chicken Manchurian','Chilli Chicken','Chicken 65','Chicken Fry','Chicken Kabab'] },
+  { id: 'pickles', img: 'pickles', title: 'Pickles & Pachadis', emoji: '🫙', accent: '#7CB342', tagline: 'Tiny jars. Massive attitude.', veg: ['Mamidikaya Turumu Pachadi','Mango Pickle','Green Chilli Pickle','Carrot Turumu','Madras Illi Karam','Grape Pickle','Cauliflower Pickle','Beerakaya Pickle','Sorakaya Pickle','Lemon Pickle','Garlic Pickle','Tomato Pickle','Gongura Pickle'], nonveg: [] },
+  { id: 'biryani', img: 'biryani', title: 'Biryanis', emoji: '🍛', accent: '#D4A843', tagline: 'Infinite timelines. One destiny.', veg: ['Veg Biryani','Paneer Biryani','Plain Dum Biryani','Panasa Biryani','Mushroom Biryani','Green Biryani','Baby Corn Mushroom Biryani'], nonveg: ['Chicken Dum Biryani','Chicken Fry Piece Biryani','Mutton Dum Biryani','Prawns Fry Biryani','Fish Fry Biryani','Special Chicken Biryani','Egg Biryani'] },
+  { id: 'streetsnack', img: 'streetsnack', title: 'Street Snacks', emoji: '🍢', accent: '#FF6B35', tagline: 'The 5PM hunger patch', veg: ['Onion Pakodi','Mirchi Bajji','Punugulu','Samosa','Peanut Masala','Bread Bonda','Hara Bara Kabab','Bread Pulu Kabab','Sandwich','Veg Cutlet','Paneer Baji','Bread Cutlet'], nonveg: ['Fish Pakodi','Loose Prawns','Apollo Fish','Krish Kama'] },
+  { id: 'sweets', img: 'sweets', title: 'Sweets & Desserts', emoji: '🍮', accent: '#E8A030', tagline: 'Every meal deserves a sweet ending', veg: ['Gulab Jamun','Carrot Halwa','Badam Halwa','Fruit Halwa','Fruit Salad','Vegetable Salad','Kacha Apple Burfi','Tarangani Sweet','Ice Cream','Basundi','Malpuri','Dry Fruit Sweets'], nonveg: [] },
 ];
 
 type Section = typeof SECTIONS[0];
 
 const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => void }) => {
-  const [tab, setTab] = useState<'veg'|'nonveg'|'all'>('all');
+  const [tab, setTab] = useState<'all'|'veg'|'nonveg'>('all');
   const hasNonveg = section.nonveg.length > 0;
   const vegItems = tab === 'nonveg' ? [] : section.veg;
   const nonvegItems = tab === 'veg' ? [] : section.nonveg;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: '100%' }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: '100%' }}
-      transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-      className="absolute inset-0 z-20 flex flex-col rounded-[28px] overflow-hidden"
-      style={{ background: 'rgba(8,6,4,0.97)', backdropFilter: 'blur(20px)' }}
+      initial={{ y: '100%' }}
+      animate={{ y: 0 }}
+      exit={{ y: '100%' }}
+      transition={{ type: 'spring', damping: 34, stiffness: 340, mass: 0.9 }}
+      className="absolute inset-0 z-20 flex flex-col overflow-hidden"
+      style={{ background: 'rgba(8,6,4,0.97)', borderRadius: 'inherit' }}
     >
       <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0"
         style={{ borderBottom: `1px solid ${section.accent}25` }}>
@@ -103,13 +47,11 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
           <div className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: section.accent }}>
             {section.emoji} {section.title}
           </div>
-          <div className="text-white font-black text-lg leading-tight">
-            {section.veg.length + section.nonveg.length} Items Total
-          </div>
+          <div className="text-white font-black text-lg">{section.veg.length + section.nonveg.length} Items Total</div>
         </div>
         <button onClick={onClose}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90"
-          style={{ background: 'rgba(255,255,255,0.12)' }}>
+          className="w-9 h-9 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(255,255,255,0.1)' }}>
           <X size={18} className="text-white" />
         </button>
       </div>
@@ -118,58 +60,43 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
         <div className="flex gap-2 px-5 py-3 flex-shrink-0">
           {(['all','veg','nonveg'] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all active:scale-95"
-              style={{
-                background: tab === t ? section.accent : 'rgba(255,255,255,0.08)',
-                color: tab === t ? '#0A0806' : 'rgba(255,255,255,0.55)',
-              }}>
+              className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+              style={{ background: tab === t ? section.accent : 'rgba(255,255,255,0.08)', color: tab === t ? '#080604' : 'rgba(255,255,255,0.5)' }}>
               {t === 'all' ? 'All' : t === 'veg' ? '🟢 Veg' : '🔴 Non-Veg'}
             </button>
           ))}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto px-5 pb-6 space-y-5" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex-1 overflow-y-auto px-5 pb-8" style={{ scrollbarWidth: 'none' }}>
         {vegItems.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-2 mt-4">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0"></span>
-              <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest">
-                Vegetarian · {vegItems.length} items
-              </span>
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span className="text-emerald-400 text-xs font-bold uppercase tracking-widest">Vegetarian · {vegItems.length} items</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {vegItems.map((item, i) => (
-                <motion.span key={i}
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.015, type: 'spring', stiffness: 300 }}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium text-white/85"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(82,168,82,0.25)' }}>
+                <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(82,168,82,0.2)' }}>
                   {item}
-                </motion.span>
+                </span>
               ))}
             </div>
           </div>
         )}
         {nonvegItems.length > 0 && (
-          <div>
-            <div className="flex items-center gap-2 mb-2 mt-4">
-              <span className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0"></span>
-              <span className="text-red-400 text-xs font-bold uppercase tracking-widest">
-                Non-Vegetarian · {nonvegItems.length} items
-              </span>
+          <div className="mt-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-red-400"></span>
+              <span className="text-red-400 text-xs font-bold uppercase tracking-widest">Non-Veg · {nonvegItems.length} items</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {nonvegItems.map((item, i) => (
-                <motion.span key={i}
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.015, type: 'spring', stiffness: 300 }}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium text-white/85"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(212,64,64,0.25)' }}>
+                <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium text-white/80"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(212,64,64,0.2)' }}>
                   {item}
-                </motion.span>
+                </span>
               ))}
             </div>
           </div>
@@ -179,113 +106,21 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
   );
 };
 
-const StorySlide = ({ section, isActive, isAdjacent }: { section: Section; isActive: boolean; isAdjacent: boolean }) => {
-  const [showItems, setShowItems] = useState(false);
-  const total = section.veg.length + section.nonveg.length;
-
-  return (
-    <div className="relative flex-shrink-0 h-full rounded-[24px] overflow-hidden select-none"
-      style={{
-        width: '100%',
-        boxShadow: isActive ? '0 20px 60px rgba(0,0,0,0.7)' : '0 8px 24px rgba(0,0,0,0.4)',
-        transform: isActive ? 'scale(1)' : isAdjacent ? 'scale(0.93)' : 'scale(0.88)',
-        transition: 'transform 0.45s cubic-bezier(0.25,0.1,0.1,1), box-shadow 0.45s ease',
-        opacity: isActive ? 1 : isAdjacent ? 0.7 : 0.4,
-      }}>
-
-      <img
-        src={IMGS[section.img]}
-        alt={section.title}
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{
-          transform: isActive ? 'scale(1.05)' : 'scale(1)',
-          transition: 'transform 0.6s cubic-bezier(0.25,0.1,0.1,1)'
-        }}
-        draggable={false}
-      />
-
-      {/* Gradients */}
-      <div className="absolute inset-0" style={{
-        background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 30%, transparent 50%, rgba(0,0,0,0.9) 100%)'
-      }} />
-
-      {/* Top info */}
-      <div className="absolute top-0 left-0 right-0 p-4 md:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="text-white font-black text-xl md:text-2xl leading-tight drop-shadow-lg" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-              {section.emoji} {section.title}
-            </div>
-            <div className="text-white/65 text-xs md:text-sm mt-0.5 font-medium">{section.tagline}</div>
-          </div>
-          <div className="flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-2xl"
-            style={{ background: `${section.accent}DD`, backdropFilter: 'blur(10px)' }}>
-            <span className="text-white font-black text-xl leading-none">{total}</span>
-            <span className="text-white/80 text-[9px] uppercase tracking-wider font-bold mt-0.5">items</span>
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-2.5">
-          {section.veg.length > 0 && (
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white/90"
-              style={{ background: 'rgba(52,168,52,0.2)', border: '1px solid rgba(82,168,82,0.45)', backdropFilter: 'blur(8px)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              {section.veg.length} veg
-            </span>
-          )}
-          {section.nonveg.length > 0 && (
-            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white/90"
-              style={{ background: 'rgba(212,44,44,0.2)', border: '1px solid rgba(212,64,64,0.45)', backdropFilter: 'blur(8px)' }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-              {section.nonveg.length} non-veg
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Bottom CTA */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5">
-        <motion.button
-          onClick={(e) => { e.stopPropagation(); setShowItems(true); }}
-          whileTap={{ scale: 0.96 }}
-          className="w-full py-3.5 rounded-2xl font-bold text-sm uppercase tracking-widest"
-          style={{
-            background: section.accent,
-            color: '#0A0806',
-            boxShadow: `0 4px 24px ${section.accent}70`,
-          }}>
-          See All {total} Items
-        </motion.button>
-      </div>
-
-      <AnimatePresence>
-        {showItems && <ItemsPanel section={section} onClose={() => setShowItems(false)} />}
-      </AnimatePresence>
-    </div>
-  );
-};
-
 export default function MenuPage({ onBack }: { onBack: () => void }) {
   const [current, setCurrent] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
+  const [showItems, setShowItems] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragStartX = useRef(0);
+  const dragStartY = useRef(0);
   const dragStartTime = useRef(0);
-  const x = useMotionValue(0);
-
-  const GAP = 12;
-
-  const getSlideWidth = useCallback(() => {
-    if (!containerRef.current) return window.innerWidth - 48;
-    return containerRef.current.clientWidth;
-  }, []);
+  const isDragging = useRef(false);
+  const isScrolling = useRef<boolean | null>(null);
 
   const goTo = useCallback((idx: number) => {
-    const clamped = Math.max(0, Math.min(SECTIONS.length - 1, idx));
-    setCurrent(clamped);
+    setCurrent(Math.max(0, Math.min(SECTIONS.length - 1, idx)));
+    setShowItems(false);
   }, []);
 
-  // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') goTo(current + 1);
@@ -296,136 +131,191 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
     return () => window.removeEventListener('keydown', handler);
   }, [current, goTo, onBack]);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const onPointerDown = (e: React.PointerEvent) => {
     dragStartX.current = e.clientX;
+    dragStartY.current = e.clientY;
     dragStartTime.current = Date.now();
-    setIsDragging(false);
+    isDragging.current = false;
+    isScrolling.current = null;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    const diff = Math.abs(e.clientX - dragStartX.current);
-    if (diff > 8) setIsDragging(true);
-  };
-
-  const handlePointerUp = (e: React.PointerEvent) => {
-    const diff = dragStartX.current - e.clientX;
-    const duration = Date.now() - dragStartTime.current;
-    const velocity = Math.abs(diff) / duration;
-    if (Math.abs(diff) > 40 || velocity > 0.3) {
-      goTo(current + (diff > 0 ? 1 : -1));
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (isScrolling.current) return;
+    const dx = dragStartX.current - e.clientX;
+    const dt = Date.now() - dragStartTime.current;
+    const velocity = Math.abs(dx) / dt;
+    if (Math.abs(dx) > 50 || velocity > 0.4) {
+      goTo(current + (dx > 0 ? 1 : -1));
     }
-    setTimeout(() => setIsDragging(false), 50);
+    isDragging.current = false;
+    isScrolling.current = null;
   };
 
-  const slideW = getSlideWidth();
-  const trackX = -(current * (slideW + GAP));
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (isScrolling.current === null) {
+      const dx = Math.abs(e.clientX - dragStartX.current);
+      const dy = Math.abs(e.clientY - dragStartY.current);
+      if (dx > 5 || dy > 5) isScrolling.current = dy > dx;
+    }
+    if (!isScrolling.current && Math.abs(e.clientX - dragStartX.current) > 8) {
+      isDragging.current = true;
+    }
+  };
+
+  const section = SECTIONS[current];
+  const total = section.veg.length + section.nonveg.length;
 
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col overflow-hidden"
-      style={{ background: '#080604' }}>
+    <div className="fixed inset-0 z-[200] flex flex-col" style={{ background: '#080604' }}>
 
-      {/* Top bar */}
+      {/* Header */}
       <div className="flex items-center justify-between px-4 md:px-8 pt-4 pb-2 flex-shrink-0">
-        <motion.button
-          onClick={onBack}
-          whileTap={{ scale: 0.92 }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-white/70 hover:text-white text-sm font-medium transition-colors"
+        <motion.button onClick={onBack} whileTap={{ scale: 0.92 }}
+          className="flex items-center gap-1 px-3 py-2 rounded-full text-white/60 hover:text-white text-sm font-medium"
           style={{ background: 'rgba(255,255,255,0.08)' }}>
-          <ChevronLeft size={16} /> Back
+          <ChevronLeft size={15} /> Back
         </motion.button>
-
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: '#F5A623' }}>
             <ChefHat size={14} className="text-white" />
           </div>
-          <span className="font-black text-white text-lg tracking-tight">
-            JULA<span style={{ color: '#F5A623' }}>.</span>
-          </span>
+          <span className="font-black text-white text-lg tracking-tight">JULA<span style={{ color: '#F5A623' }}>.</span></span>
         </div>
-
-        <div className="text-white/35 text-xs font-medium w-16 text-right">
-          {current + 1} / {SECTIONS.length}
-        </div>
+        <div className="text-white/30 text-xs font-medium w-14 text-right">{current + 1} / {SECTIONS.length}</div>
       </div>
 
-      {/* Progress dots */}
-      <div className="flex gap-1.5 justify-center py-2 flex-shrink-0">
+      {/* Progress pills */}
+      <div className="flex gap-1.5 justify-center py-2 px-4 flex-shrink-0">
         {SECTIONS.map((s, i) => (
-          <motion.button
-            key={i}
-            onClick={() => goTo(i)}
-            animate={{ width: i === current ? 28 : 6 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+          <motion.button key={i} onClick={() => goTo(i)}
+            animate={{ width: i === current ? 28 : 6, opacity: i === current ? 1 : 0.3 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 35 }}
             className="h-1.5 rounded-full flex-shrink-0"
-            style={{ background: i === current ? SECTIONS[current].accent : 'rgba(255,255,255,0.18)' }}
+            style={{ background: i === current ? SECTIONS[current].accent : '#fff' }}
           />
         ))}
       </div>
 
-      {/* Section title strip */}
-      <div className="text-center py-1 flex-shrink-0">
+      {/* Section label */}
+      <div className="text-center py-1 flex-shrink-0 h-6">
         <AnimatePresence mode="wait">
-          <motion.div key={current}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
-            className="text-xs font-bold uppercase tracking-widest"
-            style={{ color: SECTIONS[current].accent }}>
-            {SECTIONS[current].title}
-          </motion.div>
+          <motion.span key={current}
+            initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.18 }}
+            className="text-[11px] font-bold uppercase tracking-widest"
+            style={{ color: section.accent }}>
+            {section.title}
+          </motion.span>
         </AnimatePresence>
       </div>
 
-      {/* Slide track */}
+      {/* Slide viewport — strict overflow:hidden, no padding that would expose adjacent slides */}
       <div
         ref={containerRef}
-        className="flex-1 relative overflow-hidden px-4 md:px-8 pb-4"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'pan-y' }}
+        className="flex-1 overflow-hidden relative mx-4 md:mx-8 mb-4 rounded-[24px]"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        style={{ cursor: 'grab', touchAction: 'pan-y' }}
       >
+        {/* Track — slides are full-width of viewport, translated by current index */}
         <motion.div
-          className="flex h-full items-center"
-          animate={{ x: trackX }}
-          transition={{ type: 'spring', stiffness: 320, damping: 36, mass: 0.8 }}
-          style={{ gap: GAP, width: `calc(${SECTIONS.length * 100}% + ${(SECTIONS.length - 1) * GAP}px)` }}
+          className="flex h-full"
+          animate={{ x: `${-current * 100}%` }}
+          transition={{ type: 'spring', stiffness: 380, damping: 38, mass: 0.85 }}
+          style={{ width: `${SECTIONS.length * 100}%` }}
+          drag={false}
         >
-          {SECTIONS.map((section, i) => (
-            <div key={section.id} style={{ width: `${100 / SECTIONS.length}%`, height: '100%' }}>
-              <StorySlide
-                section={section}
-                isActive={i === current}
-                isAdjacent={Math.abs(i - current) === 1}
-              />
-            </div>
-          ))}
+          {SECTIONS.map((s, i) => {
+            const sTotal = s.veg.length + s.nonveg.length;
+            const isActive = i === current;
+            return (
+              <div key={s.id} className="relative h-full" style={{ width: `${100 / SECTIONS.length}%` }}>
+                <img src={IMGS[s.img]} alt={s.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ transform: isActive ? 'scale(1.04)' : 'scale(1)', transition: 'transform 0.6s ease' }}
+                  draggable={false}
+                />
+                <div className="absolute inset-0" style={{
+                  background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 35%, transparent 50%, rgba(0,0,0,0.88) 100%)'
+                }} />
+
+                {/* Top content */}
+                <div className="absolute top-0 left-0 right-0 p-4 md:p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-white font-black text-xl md:text-3xl leading-tight"
+                        style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
+                        {s.emoji} {s.title}
+                      </div>
+                      <div className="text-white/60 text-xs md:text-sm mt-1 font-medium">{s.tagline}</div>
+                    </div>
+                    <div className="flex-shrink-0 flex flex-col items-center px-3 py-2 rounded-2xl"
+                      style={{ background: `${s.accent}CC`, backdropFilter: 'blur(10px)' }}>
+                      <span className="text-white font-black text-2xl leading-none">{sTotal}</span>
+                      <span className="text-white/75 text-[9px] uppercase tracking-wider font-bold mt-0.5">items</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    {s.veg.length > 0 && (
+                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white/90"
+                        style={{ background: 'rgba(52,168,52,0.18)', border: '1px solid rgba(82,168,82,0.4)', backdropFilter: 'blur(8px)' }}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
+                        {s.veg.length} veg
+                      </span>
+                    )}
+                    {s.nonveg.length > 0 && (
+                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white/90"
+                        style={{ background: 'rgba(212,44,44,0.18)', border: '1px solid rgba(212,64,64,0.4)', backdropFilter: 'blur(8px)' }}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span>
+                        {s.nonveg.length} non-veg
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bottom CTA */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+                  <motion.button
+                    onClick={(e) => { if (!isDragging.current) { e.stopPropagation(); if (isActive) setShowItems(true); }}}
+                    whileTap={{ scale: 0.96 }}
+                    className="w-full py-3.5 md:py-4 rounded-2xl font-bold text-sm md:text-base uppercase tracking-widest"
+                    style={{ background: s.accent, color: '#080604', boxShadow: `0 4px 28px ${s.accent}60` }}>
+                    See All {sTotal} Items
+                  </motion.button>
+                </div>
+
+                {/* Items panel — only rendered on active slide */}
+                {isActive && (
+                  <AnimatePresence>
+                    {showItems && <ItemsPanel section={s} onClose={() => setShowItems(false)} />}
+                  </AnimatePresence>
+                )}
+              </div>
+            );
+          })}
         </motion.div>
       </div>
 
-      {/* Desktop arrow nav */}
+      {/* Desktop arrows */}
       <div className="hidden md:flex items-center justify-center gap-4 pb-5 flex-shrink-0">
-        <motion.button
-          onClick={() => goTo(current - 1)}
-          disabled={current === 0}
+        <motion.button onClick={() => goTo(current - 1)} disabled={current === 0}
           whileTap={{ scale: 0.9 }}
-          className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all disabled:opacity-20"
+          className="w-11 h-11 rounded-full flex items-center justify-center text-white disabled:opacity-20"
           style={{ background: 'rgba(255,255,255,0.1)' }}>
           <ChevronLeft size={20} />
         </motion.button>
-        <motion.button
-          onClick={() => goTo(current + 1)}
-          disabled={current === SECTIONS.length - 1}
+        <motion.button onClick={() => goTo(current + 1)} disabled={current === SECTIONS.length - 1}
           whileTap={{ scale: 0.9 }}
-          className="w-11 h-11 rounded-full flex items-center justify-center text-white transition-all disabled:opacity-20"
+          className="w-11 h-11 rounded-full flex items-center justify-center text-white disabled:opacity-20"
           style={{ background: 'rgba(255,255,255,0.1)' }}>
           <ChevronRight size={20} />
         </motion.button>
       </div>
 
-      {/* Mobile swipe hint — only first visit */}
-      <div className="md:hidden text-center pb-3 text-white/25 text-[11px] font-medium flex-shrink-0 tracking-wide flex-shrink-0">
+      {/* Mobile hint */}
+      <div className="md:hidden text-center pb-3 flex-shrink-0 text-white/25 text-[10px] tracking-widest font-medium">
         ← swipe to explore →
       </div>
     </div>
