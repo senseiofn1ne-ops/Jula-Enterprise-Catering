@@ -31,43 +31,32 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
   const hasNonveg = section.nonveg.length > 0;
   const vegItems = tab === 'nonveg' ? [] : section.veg;
   const nonvegItems = tab === 'veg' ? [] : section.nonveg;
-
   return (
     <motion.div
-      initial={{ y: '100%' }}
-      animate={{ y: 0 }}
-      exit={{ y: '100%' }}
-      transition={{ type: 'spring', damping: 34, stiffness: 340, mass: 0.9 }}
+      initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+      transition={{ type: 'spring', damping: 34, stiffness: 340 }}
       className="absolute inset-0 z-20 flex flex-col overflow-hidden"
-      style={{ background: 'rgba(8,6,4,0.97)', borderRadius: 'inherit' }}
-    >
+      style={{ background: 'rgba(8,6,4,0.97)', borderRadius: 'inherit' }}>
       <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0"
         style={{ borderBottom: `1px solid ${section.accent}25` }}>
         <div>
-          <div className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: section.accent }}>
-            {section.emoji} {section.title}
-          </div>
+          <div className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: section.accent }}>{section.emoji} {section.title}</div>
           <div className="text-white font-black text-lg">{section.veg.length + section.nonveg.length} Items Total</div>
         </div>
-        <button onClick={onClose}
-          className="w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.1)' }}>
+        <button onClick={onClose} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)' }}>
           <X size={18} className="text-white" />
         </button>
       </div>
-
       {hasNonveg && (
         <div className="flex gap-2 px-5 py-3 flex-shrink-0">
           {(['all','veg','nonveg'] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)}
-              className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
+            <button key={t} onClick={() => setTab(t)} className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all"
               style={{ background: tab === t ? section.accent : 'rgba(255,255,255,0.08)', color: tab === t ? '#080604' : 'rgba(255,255,255,0.5)' }}>
               {t === 'all' ? 'All' : t === 'veg' ? '🟢 Veg' : '🔴 Non-Veg'}
             </button>
           ))}
         </div>
       )}
-
       <div className="flex-1 overflow-y-auto px-5 pb-8" style={{ scrollbarWidth: 'none' }}>
         {vegItems.length > 0 && (
           <div className="mt-4">
@@ -78,9 +67,7 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
             <div className="flex flex-wrap gap-2">
               {vegItems.map((item, i) => (
                 <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium text-white/80"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(82,168,82,0.2)' }}>
-                  {item}
-                </span>
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(82,168,82,0.2)' }}>{item}</span>
               ))}
             </div>
           </div>
@@ -94,9 +81,7 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
             <div className="flex flex-wrap gap-2">
               {nonvegItems.map((item, i) => (
                 <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium text-white/80"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(212,64,64,0.2)' }}>
-                  {item}
-                </span>
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(212,64,64,0.2)' }}>{item}</span>
               ))}
             </div>
           </div>
@@ -109,15 +94,16 @@ const ItemsPanel = ({ section, onClose }: { section: Section; onClose: () => voi
 export default function MenuPage({ onBack }: { onBack: () => void }) {
   const [current, setCurrent] = useState(0);
   const [showItems, setShowItems] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dragStartX = useRef(0);
-  const dragStartY = useRef(0);
-  const dragStartTime = useRef(0);
-  const isDragging = useRef(false);
-  const isScrolling = useRef<boolean | null>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const pointerStartX = useRef(0);
+  const pointerStartY = useRef(0);
+  const pointerStartTime = useRef(0);
+  const lockAxis = useRef<'h'|'v'|null>(null);
+  const hasDragged = useRef(false);
 
   const goTo = useCallback((idx: number) => {
-    setCurrent(Math.max(0, Math.min(SECTIONS.length - 1, idx)));
+    const next = Math.max(0, Math.min(SECTIONS.length - 1, idx));
+    setCurrent(next);
     setShowItems(false);
   }, []);
 
@@ -132,47 +118,49 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
   }, [current, goTo, onBack]);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    dragStartX.current = e.clientX;
-    dragStartY.current = e.clientY;
-    dragStartTime.current = Date.now();
-    isDragging.current = false;
-    isScrolling.current = null;
+    pointerStartX.current = e.clientX;
+    pointerStartY.current = e.clientY;
+    pointerStartTime.current = Date.now();
+    lockAxis.current = null;
+    hasDragged.current = false;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
-  const onPointerUp = (e: React.PointerEvent) => {
-    if (isScrolling.current) return;
-    const dx = dragStartX.current - e.clientX;
-    const dt = Date.now() - dragStartTime.current;
-    const velocity = Math.abs(dx) / dt;
-    if (Math.abs(dx) > 50 || velocity > 0.4) {
-      goTo(current + (dx > 0 ? 1 : -1));
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (lockAxis.current !== null) return;
+    const dx = Math.abs(e.clientX - pointerStartX.current);
+    const dy = Math.abs(e.clientY - pointerStartY.current);
+    if (dx > 6 || dy > 6) {
+      lockAxis.current = dx >= dy ? 'h' : 'v';
     }
-    isDragging.current = false;
-    isScrolling.current = null;
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (isScrolling.current === null) {
-      const dx = Math.abs(e.clientX - dragStartX.current);
-      const dy = Math.abs(e.clientY - dragStartY.current);
-      if (dx > 5 || dy > 5) isScrolling.current = dy > dx;
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (lockAxis.current !== 'h') return;
+    const dx = pointerStartX.current - e.clientX;
+    const dt = Date.now() - pointerStartTime.current;
+    const speed = Math.abs(dx) / Math.max(dt, 1);
+    if (Math.abs(dx) > 40 || speed > 0.35) {
+      hasDragged.current = true;
+      goTo(current + (dx > 0 ? 1 : -1));
     }
-    if (!isScrolling.current && Math.abs(e.clientX - dragStartX.current) > 8) {
-      isDragging.current = true;
-    }
+    lockAxis.current = null;
   };
 
   const section = SECTIONS[current];
   const total = section.veg.length + section.nonveg.length;
 
+  // Pixel offset: each slide = full viewport width, computed on render
+  const slideWidth = viewportRef.current?.clientWidth ?? (typeof window !== 'undefined' ? window.innerWidth : 390);
+  const trackX = -current * slideWidth;
+
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col" style={{ background: '#080604' }}>
+    <div className="fixed inset-0 z-[200] flex flex-col select-none" style={{ background: '#080604' }}>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 md:px-8 pt-4 pb-2 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 md:px-8 pt-4 pb-1 flex-shrink-0">
         <motion.button onClick={onBack} whileTap={{ scale: 0.92 }}
-          className="flex items-center gap-1 px-3 py-2 rounded-full text-white/60 hover:text-white text-sm font-medium"
+          className="flex items-center gap-1 px-3 py-2 rounded-full text-white/60 text-sm font-medium"
           style={{ background: 'rgba(255,255,255,0.08)' }}>
           <ChevronLeft size={15} /> Back
         </motion.button>
@@ -185,9 +173,9 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
         <div className="text-white/30 text-xs font-medium w-14 text-right">{current + 1} / {SECTIONS.length}</div>
       </div>
 
-      {/* Progress pills */}
-      <div className="flex gap-1.5 justify-center py-2 px-4 flex-shrink-0">
-        {SECTIONS.map((s, i) => (
+      {/* Progress dots */}
+      <div className="flex gap-1.5 justify-center py-2 flex-shrink-0">
+        {SECTIONS.map((_, i) => (
           <motion.button key={i} onClick={() => goTo(i)}
             animate={{ width: i === current ? 28 : 6, opacity: i === current ? 1 : 0.3 }}
             transition={{ type: 'spring', stiffness: 500, damping: 35 }}
@@ -198,11 +186,11 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Section label */}
-      <div className="text-center py-1 flex-shrink-0 h-6">
+      <div className="text-center pb-1 flex-shrink-0">
         <AnimatePresence mode="wait">
           <motion.span key={current}
             initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.18 }}
+            transition={{ duration: 0.15 }}
             className="text-[11px] font-bold uppercase tracking-widest"
             style={{ color: section.accent }}>
             {section.title}
@@ -210,43 +198,41 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
         </AnimatePresence>
       </div>
 
-      {/* Slide viewport — strict overflow:hidden, no padding that would expose adjacent slides */}
+      {/* Viewport — overflow hidden, clips to exactly one slide */}
       <div
-        ref={containerRef}
-        className="flex-1 overflow-hidden relative mx-4 md:mx-8 mb-4 rounded-[24px]"
+        ref={viewportRef}
+        className="flex-1 overflow-hidden mx-4 md:mx-8 mb-4 rounded-[24px]"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         style={{ cursor: 'grab', touchAction: 'pan-y' }}
       >
-        {/* Track — slides are full-width of viewport, translated by current index */}
+        {/* Track moves in px based on real measured width */}
         <motion.div
           className="flex h-full"
-          animate={{ x: `${-current * 100}%` }}
-          transition={{ type: 'spring', stiffness: 380, damping: 38, mass: 0.85 }}
-          style={{ width: `${SECTIONS.length * 100}%` }}
-          drag={false}
+          animate={{ x: trackX }}
+          transition={{ type: 'spring', stiffness: 360, damping: 38, mass: 0.85 }}
+          style={{ width: slideWidth * SECTIONS.length }}
         >
           {SECTIONS.map((s, i) => {
             const sTotal = s.veg.length + s.nonveg.length;
             const isActive = i === current;
             return (
-              <div key={s.id} className="relative h-full" style={{ width: `${100 / SECTIONS.length}%` }}>
-                <img src={IMGS[s.img]} alt={s.title}
+              <div key={s.id} className="relative h-full flex-shrink-0" style={{ width: slideWidth }}>
+                <img
+                  src={IMGS[s.img]} alt={s.title}
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ transform: isActive ? 'scale(1.04)' : 'scale(1)', transition: 'transform 0.6s ease' }}
+                  style={{ transform: isActive ? 'scale(1.04)' : 'scale(1)', transition: 'transform 0.55s ease' }}
                   draggable={false}
                 />
                 <div className="absolute inset-0" style={{
                   background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 35%, transparent 50%, rgba(0,0,0,0.88) 100%)'
                 }} />
 
-                {/* Top content */}
                 <div className="absolute top-0 left-0 right-0 p-4 md:p-6">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-white font-black text-xl md:text-3xl leading-tight"
-                        style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
+                      <div className="text-white font-black text-xl md:text-3xl leading-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
                         {s.emoji} {s.title}
                       </div>
                       <div className="text-white/60 text-xs md:text-sm mt-1 font-medium">{s.tagline}</div>
@@ -261,32 +247,28 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
                     {s.veg.length > 0 && (
                       <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white/90"
                         style={{ background: 'rgba(52,168,52,0.18)', border: '1px solid rgba(82,168,82,0.4)', backdropFilter: 'blur(8px)' }}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>
-                        {s.veg.length} veg
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0"></span>{s.veg.length} veg
                       </span>
                     )}
                     {s.nonveg.length > 0 && (
                       <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white/90"
                         style={{ background: 'rgba(212,44,44,0.18)', border: '1px solid rgba(212,64,64,0.4)', backdropFilter: 'blur(8px)' }}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span>
-                        {s.nonveg.length} non-veg
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 flex-shrink-0"></span>{s.nonveg.length} non-veg
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Bottom CTA */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
                   <motion.button
-                    onClick={(e) => { if (!isDragging.current) { e.stopPropagation(); if (isActive) setShowItems(true); }}}
+                    onClick={(e) => { e.stopPropagation(); if (!hasDragged.current && isActive) setShowItems(true); }}
                     whileTap={{ scale: 0.96 }}
-                    className="w-full py-3.5 md:py-4 rounded-2xl font-bold text-sm md:text-base uppercase tracking-widest"
+                    className="w-full py-3.5 md:py-4 rounded-2xl font-bold text-sm uppercase tracking-widest"
                     style={{ background: s.accent, color: '#080604', boxShadow: `0 4px 28px ${s.accent}60` }}>
                     See All {sTotal} Items
                   </motion.button>
                 </div>
 
-                {/* Items panel — only rendered on active slide */}
                 {isActive && (
                   <AnimatePresence>
                     {showItems && <ItemsPanel section={s} onClose={() => setShowItems(false)} />}
@@ -300,22 +282,19 @@ export default function MenuPage({ onBack }: { onBack: () => void }) {
 
       {/* Desktop arrows */}
       <div className="hidden md:flex items-center justify-center gap-4 pb-5 flex-shrink-0">
-        <motion.button onClick={() => goTo(current - 1)} disabled={current === 0}
-          whileTap={{ scale: 0.9 }}
+        <motion.button onClick={() => goTo(current - 1)} disabled={current === 0} whileTap={{ scale: 0.9 }}
           className="w-11 h-11 rounded-full flex items-center justify-center text-white disabled:opacity-20"
           style={{ background: 'rgba(255,255,255,0.1)' }}>
           <ChevronLeft size={20} />
         </motion.button>
-        <motion.button onClick={() => goTo(current + 1)} disabled={current === SECTIONS.length - 1}
-          whileTap={{ scale: 0.9 }}
+        <motion.button onClick={() => goTo(current + 1)} disabled={current === SECTIONS.length - 1} whileTap={{ scale: 0.9 }}
           className="w-11 h-11 rounded-full flex items-center justify-center text-white disabled:opacity-20"
           style={{ background: 'rgba(255,255,255,0.1)' }}>
           <ChevronRight size={20} />
         </motion.button>
       </div>
 
-      {/* Mobile hint */}
-      <div className="md:hidden text-center pb-3 flex-shrink-0 text-white/25 text-[10px] tracking-widest font-medium">
+      <div className="md:hidden text-center pb-3 flex-shrink-0 text-white/20 text-[10px] tracking-widest font-medium">
         ← swipe to explore →
       </div>
     </div>
